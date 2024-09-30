@@ -20,6 +20,12 @@ public class DemoTestConfiguration extends InngestConfiguration {
         addInngestFunction(functions, new SendEventFunction());
         addInngestFunction(functions, new NonRetriableErrorFunction());
         addInngestFunction(functions, new RetriableErrorFunction());
+        addInngestFunction(functions, new ZeroRetriesFunction());
+        addInngestFunction(functions, new InvokeFailureFunction());
+        addInngestFunction(functions, new TryCatchRunFunction());
+        addInngestFunction(functions, new ThrottledFunction());
+        addInngestFunction(functions, new DebouncedFunction());
+        addInngestFunction(functions, new PriorityFunction());
 
         return functions;
     }
@@ -47,7 +53,7 @@ public class DemoTestConfiguration extends InngestConfiguration {
     }
 
     @Bean
-    protected DevServerComponent devServerComponent(@Autowired Inngest inngestClient) throws Exception {
-        return new DevServerComponent();
+    protected DevServerComponent devServerComponent(@Autowired CommHandler commHandler) throws Exception {
+        return new DevServerComponent(commHandler);
     }
 }

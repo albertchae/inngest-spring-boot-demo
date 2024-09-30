@@ -1,8 +1,6 @@
 package com.inngest.springbootdemo;
 
-import com.inngest.CommHandler;
 import com.inngest.Inngest;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -13,12 +11,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @IntegrationTest
 @Execution(ExecutionMode.CONCURRENT)
 class WaitForEventFunctionIntegrationTest {
-
-    @BeforeAll
-    static void setup(@Autowired CommHandler handler) {
-        handler.register("http://localhost:8080");
-    }
-
     @Autowired
     private DevServerComponent devServer;
 
@@ -29,7 +21,7 @@ class WaitForEventFunctionIntegrationTest {
 
     @Test
     void testWaitForEventFunctionWhenFullFilled() throws Exception {
-        String eventId = InngestFunctionTestHelpers.sendEvent(client, "test/wait-for-event").first();
+        String eventId = InngestFunctionTestHelpers.sendEvent(client, "test/wait-for-event").getIds()[0];
 
         Thread.sleep(sleepTime);
 
@@ -39,7 +31,7 @@ class WaitForEventFunctionIntegrationTest {
         assertEquals(run.getStatus(), "Running");
         assertNull(run.getEnded_at());
 
-        InngestFunctionTestHelpers.sendEvent(client, "test/yolo.wait").first();
+        InngestFunctionTestHelpers.sendEvent(client, "test/yolo.wait");
 
         Thread.sleep(sleepTime);
 
@@ -53,7 +45,7 @@ class WaitForEventFunctionIntegrationTest {
 
     @Test
     void testWaitForEventFunctionWhenTimeOut() throws Exception {
-        String eventId = InngestFunctionTestHelpers.sendEvent(client, "test/wait-for-event").first();
+        String eventId = InngestFunctionTestHelpers.sendEvent(client, "test/wait-for-event").getIds()[0];
 
         Thread.sleep(sleepTime);
 

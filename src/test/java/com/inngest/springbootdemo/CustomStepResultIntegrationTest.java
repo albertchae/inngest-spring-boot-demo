@@ -1,9 +1,7 @@
 package com.inngest.springbootdemo;
 
-import com.inngest.CommHandler;
 import com.inngest.Inngest;
 import com.inngest.springbootdemo.testfunctions.TestFuncResult;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -14,11 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @IntegrationTest
 @Execution(ExecutionMode.CONCURRENT)
 class CustomStepResultIntegrationTest {
-    @BeforeAll
-    static void setup(@Autowired CommHandler handler) {
-        handler.register("http://localhost:8080");
-    }
-
     @Autowired
     private DevServerComponent devServer;
 
@@ -30,7 +23,7 @@ class CustomStepResultIntegrationTest {
 
     @Test
     void testMultiStepsFunctionWithClassResultStep() throws Exception {
-        String eventId = InngestFunctionTestHelpers.sendEvent(client, "test/custom.result.step").first();
+        String eventId = InngestFunctionTestHelpers.sendEvent(client, "test/custom.result.step").getIds()[0];
 
         Thread.sleep(sleepTime);
 

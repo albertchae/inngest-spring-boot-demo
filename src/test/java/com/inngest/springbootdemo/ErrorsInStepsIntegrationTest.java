@@ -1,14 +1,11 @@
 package com.inngest.springbootdemo;
 
-import com.inngest.CommHandler;
 import com.inngest.Inngest;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,11 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @IntegrationTest
 @Execution(ExecutionMode.CONCURRENT)
 class ErrorsInStepsIntegrationTest {
-    @BeforeAll
-    static void setup(@Autowired CommHandler handler) {
-        handler.register("http://localhost:8080");
-    }
-
     @Autowired
     private DevServerComponent devServer;
 
@@ -32,7 +24,7 @@ class ErrorsInStepsIntegrationTest {
 
     @Test
     void testNonRetriableShouldFail() throws Exception {
-        String eventId = InngestFunctionTestHelpers.sendEvent(client, "test/non.retriable").first();
+        String eventId = InngestFunctionTestHelpers.sendEvent(client, "test/non.retriable").getIds()[0];
 
         Thread.sleep(sleepTime);
 
@@ -43,13 +35,28 @@ class ErrorsInStepsIntegrationTest {
         assertNotNull(run.getEnded_at());
         assert output.get("name").contains("NonRetriableError");
         assert output.get("stack").contains("NonRetriableErrorFunction.lambda$execute");
-        assertEquals(output.get("message"), "something fatally went wrong");
+        assertEquals(output.get("message"), "Something fatally went wrong");
     }
 
+    @Test
+    void testFunctionSetToZeroRetriesShouldFail() throws Exception {
+        String eventId = InngestFunctionTestHelpers.sendEvent(client, "test/zero.retries").getIds()[0];
+
+        Thread.sleep(sleepTime);
+
+        RunEntry<Object> run = devServer.runsByEvent(eventId).first();
+        LinkedHashMap<String, String> output = (LinkedHashMap<String, String>) run.getOutput();
+
+        assertEquals("Failed", run.getStatus());
+        assertNotNull(run.getEnded_at());
+
+        assert output.get("name").contains("RetryAfterError");
+        assert output.get("stack").contains("ZeroRetriesFunction.lambda$execute");
+    }
 
     @Test
     void testRetriableShouldSucceedAfterFirstAttempt() throws Exception {
-        String eventId = InngestFunctionTestHelpers.sendEvent(client, "test/retriable").first();
+        String eventId = InngestFunctionTestHelpers.sendEvent(client, "test/retriable").getIds()[0];
 
         Thread.sleep(5000);
 
