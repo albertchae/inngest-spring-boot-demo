@@ -24,8 +24,16 @@ public class DemoTestConfiguration extends InngestConfiguration {
         addInngestFunction(functions, new InvokeFailureFunction());
         addInngestFunction(functions, new TryCatchRunFunction());
         addInngestFunction(functions, new ThrottledFunction());
+        addInngestFunction(functions, new RateLimitedFunction());
         addInngestFunction(functions, new DebouncedFunction());
         addInngestFunction(functions, new PriorityFunction());
+        addInngestFunction(functions, new IdempotentFunction());
+        addInngestFunction(functions, new Scale2DObjectFunction());
+        addInngestFunction(functions, new MultiplyMatrixFunction());
+        addInngestFunction(functions, new WithOnFailureFunction());
+        addInngestFunction(functions, new LoopFunction());
+        addInngestFunction(functions, new CancelOnEventFunction());
+        addInngestFunction(functions, new CancelOnMatchFunction());
 
         return functions;
     }
