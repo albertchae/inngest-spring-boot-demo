@@ -1,0 +1,1 @@
+rootProject.name = "inngest-spring-boot-demo"
